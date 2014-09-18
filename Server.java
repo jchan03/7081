@@ -272,12 +272,35 @@ public class Server {
 				switch(cm.getType()) {
 
 				case ChatMessage.MESSAGE:
-					if (message.contains("--adduser")) // Client sends msg: --adduser
-						// Split message into commands
-						// Check pass.txt for admin access
-						// Edit pass.txt with 3rd column for admin access
-						// Append pass.txt with new user credentials
-					else				
+					if (message.startsWith("--adduser")) {
+						// usage: --adduser <name> <access#>
+						String line = "";
+						try{						
+							BufferedReader br = new BufferedReader(new FileReader("pass.txt"));
+							while((line = br.readLine()) != null) {
+								String [] dbAccess = line.split(":");
+								if(dbAccess[0].equals(username) && dbAccess[2].equals("777")){
+									String [] userInput = message.split(" ");
+									if(userInput.length != 4)
+										broadcast("Usage: --adduser <username> <password> <access>");
+									else {
+										String newUser = userInput[1];
+										String newPass = userInput[2];
+										String accessCode = userInput[3];
+										BufferedWriter bw = new BufferedWriter(new FileWriter("pass.txt", true));
+										String newID = newUser + ":" + newPass + ":" + accessCode;
+										bw.append(newID);
+										bw.newLine();
+										bw.close();
+										broadcast(newUser + " has been created.");
+									}
+								}
+							}
+						} catch (IOException e) {
+							broadcast("Errors: " + e);
+						}
+
+					} else				
 						broadcast(username + ": " + message);
 					break;
 				case ChatMessage.LOGOUT:
