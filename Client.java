@@ -243,6 +243,7 @@ public class Client  {
 						display("Incorrect Username/Password");
 						cg.connectionFailed();
 					}
+					display(msg);
 
 				}
 				catch(IOException e) {

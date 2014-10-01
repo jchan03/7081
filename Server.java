@@ -224,9 +224,17 @@ public class Server {
 					String[] upass = line.split(":");
 					String u = upass[0]; 
 					String p = upass[1];
+					String t = upass[2];
+					
+					if(t.equals("777"))
+						t = new String("Admin");
+					else if(t.equals("666"))
+						t = new String("Scrum Master");
+					else if(t.equals("555"))
+						t = new String("Developer");
 
 					if(u.equals(user) && p.equals(pass)) {
-						display(user + " just connected.");
+						display(t + " " + user + " just connected.");
 						username = user;
 						flag = true;
 					}
@@ -279,7 +287,8 @@ public class Server {
 							BufferedReader br = new BufferedReader(new FileReader("pass.txt"));
 							while((line = br.readLine()) != null) {
 								String [] dbAccess = line.split(":");
-								if(dbAccess[0].equals(username) && dbAccess[2].equals("777")){
+								if(dbAccess[0].equals(username) && dbAccess[2].equals("777"))
+								{
 									String [] userInput = message.split(" ");
 									if(userInput.length != 4)
 										broadcast("Usage: --adduser <username> <password> <access>");
@@ -293,6 +302,25 @@ public class Server {
 										bw.newLine();
 										bw.close();
 										broadcast(newUser + " has been created.");
+									}
+								}
+								if(dbAccess[0].equals(username) && dbAccess[2].equals("666"))
+								{
+									String [] userInput = message.split(" ");
+									if(userInput.length != 4 || !(userInput[3].equals("555")))
+										broadcast("Usage: --adduser <username> <password> <access>" + 
+													"Scrum Master may only add/remove developers");
+									else
+									{
+										String newUser = userInput[1];
+										String newPass = userInput[2];
+										String accessCode = userInput[3];
+										BufferedWriter bw = new BufferedWriter(new FileWriter("pass.txt", true));
+										String newID = newUser + ":" + newPass + ":" + accessCode;
+										bw.append(newID);
+										bw.newLine();
+										bw.close();
+										broadcast(newUser + " Developer has been created.");
 									}
 								}
 							}
